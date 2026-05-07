@@ -33,7 +33,7 @@ def apply_gravity(packed_boxes):
 
     return packed_boxes
 
-@app.route('/simulate', methods=['POST'])
+@app.route('/api/simulate', methods=['POST'])
 def simulate_packing():
     # 1. Get the data from React
     data = request.json
