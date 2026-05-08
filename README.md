@@ -1,4 +1,4 @@
-# Tuck Packer Prototype
+# Truck Packer Prototype
 
 This is a prototype for an upcoming project. A Truck packing helper system
 
