@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS           # FIX #1: import flask-cors
+from flask_cors import CORS
 from py3dbp import Packer, Bin, Item
 
 app = Flask(__name__)
-CORS(app)                             # FIX #1: enable CORS for all routes
+CORS(app)
 
 
 def apply_gravity(packed_boxes):
@@ -37,10 +37,16 @@ def apply_gravity(packed_boxes):
 
 @app.route('/api/simulate', methods=['POST'])
 def simulate_packing():
-    # 1. Get the data from React
-    data = request.json
-    num_small = int(data.get('small', 0))
-    num_large = int(data.get('large', 0))
+    # 1. Get data from React
+    data = request.json or {}
+    box_types = data.get('box_types', [])
+    if not box_types:
+        num_small = int(data.get('small', 0))
+        num_large = int(data.get('large', 0))
+        box_types = [
+            {'p': 1, 'l': 1, 't': 1, 'quantity': num_small},
+            {'p': 2, 'l': 2, 't': 2, 'quantity': num_large},
+        ]
 
     # 2. Initialize the Packer
     packer = Packer()
@@ -51,14 +57,19 @@ def simulate_packing():
 
     # 4. Add the items based on user input
     item_id_counter = 1
+    for idx, box_type in enumerate(box_types):
+        p = float(box_type.get('p', 0))
+        l = float(box_type.get('l', 0))
+        t = float(box_type.get('t', 0))
+        quantity = int(box_type.get('quantity', 0))
 
-    for _ in range(num_small):
-        packer.add_item(Item(f'Small_Box_{item_id_counter}', 1, 1, 1, 10))
-        item_id_counter += 1
+        if p <= 0 or l <= 0 or t <= 0 or quantity <= 0:
+            continue
 
-    for _ in range(num_large):
-        packer.add_item(Item(f'Large_Box_{item_id_counter}', 2, 2, 2, 50))
-        item_id_counter += 1
+        item_weight = max(1, int(p * l * t))
+        for _ in range(quantity):
+            packer.add_item(Item(f'BoxType{idx + 1}_{item_id_counter}', p, t, l, item_weight))
+            item_id_counter += 1
 
     # 5. Run the packing algorithm
     packer.pack()
@@ -86,7 +97,7 @@ def simulate_packing():
     # 7. Apply gravity fix
     grounded_boxes = apply_gravity(packed_boxes)
 
-    # 8. Calculate utilization % — FIX #2: now returned to frontend
+    # 8. Calculate utilization %
     truck_volume = truck_w * truck_h * truck_d
     packed_volume = sum(b['width'] * b['height'] * b['depth'] for b in grounded_boxes)
     utilization = round((packed_volume / truck_volume) * 100, 1) if truck_volume > 0 else 0
@@ -99,6 +110,5 @@ def simulate_packing():
     })
 
 
-# FIX #3: app.run() so you can start Flask locally with: python api/index.py
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
