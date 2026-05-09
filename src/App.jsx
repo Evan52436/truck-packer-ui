@@ -35,8 +35,9 @@ export default function App() {
   const [boxTypes, setBoxTypes] = useState([
     createBoxType(1, 1, 1, 1, 12),
     createBoxType(2, 2, 2, 2, 4),
+    createBoxType(3, 1.5, 1.5, 1.5, 8),
   ]);
-  const [nextBoxId, setNextBoxId] = useState(3);
+  const [nextBoxId, setNextBoxId] = useState(4);
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState(null);
 
