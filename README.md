@@ -1,20 +1,94 @@
-# Truck Packer Prototype
+# Truck Packer UI
 
-This is a prototype for an upcoming project. A Truck packing helper system
+A simple truck-loading simulator with a React frontend and Flask backend.  
+You can define box dimensions and quantities, run a packing simulation, and view 3D results with utilization stats.
 
-# React + Vite
+## Features
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- 3D truck visualization using React Three Fiber
+- Dynamic box-type input cards
+- **Three default box templates** on startup:
+  - Type 1: `1 x 1 x 1` (qty `12`)
+  - Type 2: `2 x 2 x 2` (qty `4`)
+  - Type 3: `1.5 x 1.5 x 1.5` (qty `8`)
+- Packing simulation via Flask + `py3dbp`
+- Result metrics: utilization %, packed count, unplaced count
 
-Currently, two official plugins are available:
+## Project Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `src/` - React app (`App.jsx` contains UI and simulation flow)
+- `api/` - Flask API (`index.py` exposes `/api/simulate`)
 
-## React Compiler
+## Requirements
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 18+ (recommended)
+- Python 3.10+ (recommended)
 
-## Expanding the ESLint configuration
+## Install
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Frontend
+
+```bash
+npm install
+```
+
+### Backend
+
+```bash
+cd api
+pip install -r requirements.txt
+```
+
+## Run Locally
+
+Open two terminals.
+
+### Terminal 1: Flask API
+
+```bash
+cd api
+python index.py
+```
+
+Backend runs on `http://localhost:5000`.
+
+### Terminal 2: React app
+
+```bash
+npm run dev
+```
+
+Frontend runs on Vite's local dev URL (usually `http://localhost:5173`).
+
+## How To Use
+
+1. Edit any box type dimensions (`P`, `L`, `T`) and `Quantity`
+2. Click **Add Box Type** if you need more templates
+3. Click **Simulate Packing**
+4. Inspect the 3D arrangement and utilization stats
+5. Click **Clear Truck** to reset the visualization
+
+## API
+
+### `POST /api/simulate`
+
+Request body:
+
+```json
+{
+  "box_types": [
+    { "p": 1, "l": 1, "t": 1, "quantity": 12 }
+  ]
+}
+```
+
+Response shape:
+
+```json
+{
+  "boxes": [],
+  "utilization": 0,
+  "packed_count": 0,
+  "unplaced_count": 0
+}
+```
