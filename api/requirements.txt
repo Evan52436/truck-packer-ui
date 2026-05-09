@@ -1,7 +1,3 @@
 Flask
-<<<<<<< HEAD
 flask-cors
 py3dbp
-=======
-py3dbp
->>>>>>> upstream/master
